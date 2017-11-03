@@ -1,0 +1,229 @@
+-- 도서대분류
+DROP TABLE IF EXISTS library.book_big_group RESTRICT;
+
+-- 도서중분류
+DROP TABLE IF EXISTS library.book_middle_group RESTRICT;
+
+-- 도서
+DROP TABLE IF EXISTS library.book RESTRICT;
+
+-- 출판사
+DROP TABLE IF EXISTS library.publisher RESTRICT;
+
+-- 유저
+DROP TABLE IF EXISTS library.users RESTRICT;
+
+-- 유저등급
+DROP TABLE IF EXISTS library.userrank RESTRICT;
+
+-- 대여현황
+DROP TABLE IF EXISTS library.rentalbook RESTRICT;
+
+-- 히스토리
+DROP TABLE IF EXISTS library.history RESTRICT;
+
+-- 도서관
+DROP SCHEMA IF EXISTS library;
+
+-- 도서관
+CREATE SCHEMA library;
+
+-- 도서대분류
+CREATE TABLE library.book_big_group (
+   big_group INTEGER NOT NULL COMMENT '대분류' -- 대분류
+)
+COMMENT '도서대분류';
+
+-- 도서대분류
+ALTER TABLE library.book_big_group
+   ADD CONSTRAINT PK_book_big_group -- 도서대분류 기본키
+      PRIMARY KEY (
+         big_group -- 대분류
+      );
+
+-- 도서중분류
+CREATE TABLE library.book_middle_group (
+   middle_group INTEGER NOT NULL COMMENT '중분류', -- 중분류
+   big_group    INTEGER NULL     COMMENT '대분류' -- 대분류
+)
+COMMENT '도서중분류';
+
+-- 도서중분류
+ALTER TABLE library.book_middle_group
+   ADD CONSTRAINT PK_book_middle_group -- 도서중분류 기본키
+      PRIMARY KEY (
+         middle_group -- 중분류
+      );
+
+-- 도서
+CREATE TABLE library.book (
+   book_code        VARCHAR(13) NOT NULL COMMENT '도서코드', -- 도서코드
+   book_name        VARCHAR(50) NULL     COMMENT '도서명', -- 도서명
+   author           VARCHAR(50) NULL     COMMENT '저자', -- 저자
+   public_name      VARCHAR(50) NULL     COMMENT '출판사이름', -- 출판사이름
+   price            INTEGER     NULL     COMMENT '가격', -- 가격
+   amount           INTEGER     NULL     COMMENT '총 수량', -- 총 수량
+   all_rentel_count INTEGER     NULL     COMMENT '총 대여 수량' -- 총 대여 수량
+)
+COMMENT '도서';
+
+-- 도서
+ALTER TABLE library.book
+   ADD CONSTRAINT PK_book -- 도서 기본키
+      PRIMARY KEY (
+         book_code -- 도서코드
+      );
+
+-- 출판사
+CREATE TABLE library.publisher (
+   public_code VARCHAR(50) NOT NULL COMMENT '출판사코드', -- 출판사코드
+   public_name VARCHAR(50) NULL     COMMENT '출판사이름' -- 출판사이름
+)
+COMMENT '출판사';
+
+-- 출판사
+ALTER TABLE library.publisher
+   ADD CONSTRAINT PK_publisher -- 출판사 기본키
+      PRIMARY KEY (
+         public_code -- 출판사코드
+      );
+
+-- 유저
+CREATE TABLE library.users (
+   user_id    VARCHAR(50) NOT NULL COMMENT '아이디', -- 아이디
+   user_name  VARCHAR(50) NULL     COMMENT '이름', -- 이름
+   user_pw    VARCHAR(50) NULL     COMMENT '비밀번호', -- 비밀번호
+   user_addr  VARCHAR(50) NULL     COMMENT '주소', -- 주소
+   user_tel   VARCHAR(50) NULL     COMMENT '전화번호', -- 전화번호
+   user_email VARCHAR(50) NULL     COMMENT '이메일', -- 이메일
+   delay_day  INTEGER     NULL     COMMENT '연체일', -- 연체일
+   rank_code  INTEGER     NULL     COMMENT '유저등급', -- 유저등급
+   user_leave VARCHAR(50) NULL     COMMENT '탈퇴여부' -- 탈퇴여부
+)
+COMMENT '유저';
+
+-- 유저
+ALTER TABLE library.users
+   ADD CONSTRAINT PK_users -- 유저 기본키
+      PRIMARY KEY (
+         user_id -- 아이디
+      );
+
+-- 유저등급
+CREATE TABLE library.userrank (
+   rank_code INTEGER     NOT NULL COMMENT '유저등급', -- 유저등급
+   rank_name VARCHAR(50) NULL     COMMENT '등급명' -- 등급명
+)
+COMMENT '유저등급';
+
+-- 유저등급
+ALTER TABLE library.userrank
+   ADD CONSTRAINT PK_userrank -- 유저등급 기본키
+      PRIMARY KEY (
+         rank_code -- 유저등급
+      );
+
+-- 대여현황
+CREATE TABLE library.rentalbook (
+   rentalday DATE        NOT NULL COMMENT '대여일', -- 대여일
+   book_code VARCHAR(13) NULL     COMMENT '도서코드', -- 도서코드
+   user_id   VARCHAR(50) NULL     COMMENT '아이디', -- 아이디
+   returnday DATE        NULL     COMMENT '반납예정일' -- 반납예정일
+)
+COMMENT '대여현황';
+
+-- 대여현황
+ALTER TABLE library.rentalbook
+   ADD CONSTRAINT PK_rentalbook -- 대여현황 기본키
+      PRIMARY KEY (
+         rentalday -- 대여일
+      );
+
+-- 히스토리
+CREATE TABLE library.history (
+   book_code     VARCHAR(13) NULL COMMENT '도서코드', -- 도서코드
+   user_id       VARCHAR(50) NULL COMMENT '아이디', -- 아이디
+   rentalday     DATE        NULL COMMENT '대여일', -- 대여일
+   realreturnday DATE        NULL COMMENT '반납일' -- 반납일
+)
+COMMENT '히스토리';
+
+-- 도서중분류
+ALTER TABLE library.book_middle_group
+   ADD CONSTRAINT FK_book_big_group_TO_book_middle_group -- 도서대분류 -> 도서중분류
+      FOREIGN KEY (
+         big_group -- 대분류
+      )
+      REFERENCES library.book_big_group ( -- 도서대분류
+         big_group -- 대분류
+      );
+
+-- 도서
+ALTER TABLE library.book
+   ADD CONSTRAINT FK_publisher_TO_book -- 출판사 -> 도서
+      FOREIGN KEY (
+         public_name -- 출판사이름
+      )
+      REFERENCES library.publisher ( -- 출판사
+         public_code -- 출판사코드
+      );
+
+-- 유저
+ALTER TABLE library.users
+   ADD CONSTRAINT FK_userrank_TO_users -- 유저등급 -> 유저
+      FOREIGN KEY (
+         rank_code -- 유저등급
+      )
+      REFERENCES library.userrank ( -- 유저등급
+         rank_code -- 유저등급
+      );
+
+-- 대여현황
+ALTER TABLE library.rentalbook
+   ADD CONSTRAINT FK_book_TO_rentalbook -- 도서 -> 대여현황
+      FOREIGN KEY (
+         book_code -- 도서코드
+      )
+      REFERENCES library.book ( -- 도서
+         book_code -- 도서코드
+      );
+
+-- 대여현황
+ALTER TABLE library.rentalbook
+   ADD CONSTRAINT FK_users_TO_rentalbook -- 유저 -> 대여현황
+      FOREIGN KEY (
+         user_id -- 아이디
+      )
+      REFERENCES library.users ( -- 유저
+         user_id -- 아이디
+      );
+
+-- 히스토리
+ALTER TABLE library.history
+   ADD CONSTRAINT FK_book_TO_history -- 도서 -> 히스토리
+      FOREIGN KEY (
+         book_code -- 도서코드
+      )
+      REFERENCES library.book ( -- 도서
+         book_code -- 도서코드
+      );
+
+-- 히스토리
+ALTER TABLE library.history
+   ADD CONSTRAINT FK_users_TO_history -- 유저 -> 히스토리
+      FOREIGN KEY (
+         user_id -- 아이디
+      )
+      REFERENCES library.users ( -- 유저
+         user_id -- 아이디
+      );
+
+-- 히스토리
+ALTER TABLE library.history
+   ADD CONSTRAINT FK_rentalbook_TO_history -- 대여현황 -> 히스토리
+      FOREIGN KEY (
+         rentalday -- 대여일
+      )
+      REFERENCES library.rentalbook ( -- 대여현황
+         rentalday -- 대여일
+      );
