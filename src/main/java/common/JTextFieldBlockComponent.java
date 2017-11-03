@@ -24,4 +24,12 @@ public class JTextFieldBlockComponent extends JPanel {
 
 	}
 
+	public JTextField getTextField() {
+		return textField;
+	}
+
+	public void setTextField(JTextField textField) {
+		this.textField = textField;
+	}
+
 }
