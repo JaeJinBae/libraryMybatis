@@ -15,7 +15,6 @@ public class TestMain {
 		Connection connection = dbCon.getConnection();
 		System.out.println(connection);
 		
-		//
 		DbService serivce = InitService.getInstance();
 		serivce.service();
 		

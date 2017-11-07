@@ -16,16 +16,17 @@ public class DBCon {
 	}
 
 	private DBCon(){
-		Properties properties = getProperties("application.properties");
+		Properties properties = getProperties("config.properties");
+		System.out.println(properties.getProperty("url"));
+		System.out.println(properties.getProperty("username"));
+		System.out.println(properties.getProperty("password"));
 		try {
 			connection = DriverManager.getConnection(properties.getProperty("url"), properties.getProperty("username"), properties.getProperty("password"));
 		} catch (SQLException e) {
 			System.err.printf("%s - %s%n", e.getErrorCode(), e.getMessage());
 			e.printStackTrace();
 		}
-		System.out.println(properties.getProperty("url"));
-		System.out.println(properties.getProperty("username"));
-		System.out.println(properties.getProperty("password"));
+		
 	}
 	
 	private Properties getProperties(String propertiesPath) {
